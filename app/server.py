@@ -17,7 +17,6 @@ from app.router.vaccination_reminder_routes import vaccination_reminder_router
 from app.router.community_routes import community_router
 from app.router.vaccination_routes import vaccine_router
 from app.router.mood_routes import router as mood_router  
-from app.database.mongo import mongo_db
 from app.router.tutorial_routes import video_tutorial_router
 
 
@@ -38,10 +37,7 @@ app.add_middleware(
 
 @app.on_event("startup")
 async def startup_event():
-    try:
-        # create_motherhood_collection()
-        await mongo_db.command("ping")
-        
+    try:        
         async with SessionLocal() as session:
             await session.execute(text("SELECT 1"))
             
