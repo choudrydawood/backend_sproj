@@ -3,9 +3,8 @@ import os
 import subprocess
 from pathlib import Path
 import shutil
-from app.database.postgres import SessionLocal, engine, Base
+from app.database.postgres import SessionLocal, engine
 from sqlalchemy import text, MetaData
-from sqlalchemy.ext.asyncio import AsyncSession
 from app.router.auth_routes import auth_router
 from app.middleware.protect_endpoints import verify_authentication
 from fastapi.middleware.cors import CORSMiddleware
@@ -37,15 +36,14 @@ app.add_middleware(
 
 @app.on_event("startup")
 async def startup_event():
-    try:        
+    try:
         async with SessionLocal() as session:
             await session.execute(text("SELECT 1"))
-            
+
         print("Databases connected successfully.")
-        
+
     except Exception as e:
         print(f"Database connection failed: {e}")
-        
         
 app.include_router(auth_router)
 app.include_router(profile_router)
@@ -125,7 +123,6 @@ async def health(reset: bool = False):
             await session.execute(text("SELECT 1"))
         
         # Check MongoDB
-        await mongo_db.command("ping")
         
         return {
             "status": "healthy",
