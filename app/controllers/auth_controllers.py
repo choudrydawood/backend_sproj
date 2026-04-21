@@ -3,17 +3,13 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.exc import SQLAlchemyError
 from fastapi import HTTPException, Response
 from sqlalchemy import select
-from itsdangerous import Signer
 from app.models.user import User
 from app.utils.hash_services import hash_password_func, verify_password
 from app.utils.token_services import generate_access_token, generate_refresh_token, verify_token
-from dotenv import load_dotenv # type: ignore
-import os
 from jose.exceptions import JWTError, ExpiredSignatureError
 
 
 class AuthController():
-    signer = Signer(os.getenv('SIGNER_KEY'))
     
     @staticmethod
     async def signup_func(data: UserCreateSchema, db: AsyncSession, res: Response):
@@ -39,14 +35,11 @@ class AuthController():
             
             access_token = generate_access_token({'id': new_user.id})
             
-            refresh_token =  generate_refresh_token({'id': new_user.id})
-            
-            signed_refresh_token = AuthController.signer.sign(refresh_token.encode()).decode()
-            
+            refresh_token = generate_refresh_token({'id': new_user.id})
             
             res.set_cookie(
                 key='refreshToken', 
-                value=signed_refresh_token,
+                value=refresh_token,
                 httponly=True,
                 secure=True,
                 samesite='Strict',
@@ -87,13 +80,11 @@ class AuthController():
             
             access_token = generate_access_token({'id': exisiting_user.id})
             
-            refresh_token =  generate_refresh_token({'id': exisiting_user.id})
-            
-            signed_refresh_token = AuthController.signer.sign(refresh_token.encode()).decode()
+            refresh_token = generate_refresh_token({'id': exisiting_user.id})
             
             res.set_cookie(
                 key='refreshToken', 
-                value=signed_refresh_token,
+                value=refresh_token,
                 httponly=True,
                 secure=True,
                 samesite='Strict',
@@ -118,19 +109,17 @@ class AuthController():
     @staticmethod
     async def refresh_access_token_func(refresh: str):
         try:
-            if refresh == None:
+            if refresh is None:
                 raise HTTPException(status_code=401, detail='You are not authorized to perform this task')
             
-            unsigned_refresh_token = AuthController.signer.unsign(refresh.encode()).decode()
-            
-            payload = verify_token(unsigned_refresh_token, 'refresh')
+            payload = verify_token(refresh, 'refresh')
                         
             if payload.get('type') == 'access':
                 raise HTTPException(status_code=403, detail='Invalid token type!')
             
             new_access_token = generate_access_token({'id': payload.get('id')})
                         
-            return  new_access_token
+            return new_access_token
            
         except ExpiredSignatureError:
             raise HTTPException(status_code=401, detail='Token has expired')
@@ -187,12 +176,6 @@ class AuthController():
                 status_code=error_dict.get('status_code', 500),
                 detail=error_dict.get('detail', 'Internal server error!')
             )
-            
-            
-    @staticmethod
-    async def logout_user_func(res: Response):
-        res.delete_cookie("refreshToken")
-        return {"message": "Logged out successfully"}
         
         
     @staticmethod 
@@ -203,7 +186,6 @@ class AuthController():
             if not user:
                 raise HTTPException(status_code=404, detail='User not found!')
             
-                        
             is_match = verify_password(data.password, user.password)
             
             if not is_match:
@@ -273,4 +255,5 @@ class AuthController():
             error_dict = e.__dict__
             raise HTTPException(
                 status_code=error_dict.get("status_code", 500),
-                detail=error_dict.get("detail", "Internal server error!"))
+                detail=error_dict.get("detail", "Internal server error!")
+            )
