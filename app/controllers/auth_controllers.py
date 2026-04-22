@@ -53,11 +53,14 @@ class AuthController():
         
         except Exception as e:
             await db.rollback()
+            print(f"LOGIN ERROR: {type(e).__name__}: {str(e)}", flush=True)  # 👈 add this
+            import traceback
+            traceback.print_exc()  # 👈 and this
             error_dict = e.__dict__
             
             raise HTTPException(
                 status_code=error_dict.get('status_code', 500),
-                detail=error_dict.get('detail', str(e))  
+                detail=error_dict.get('detail', str(e))
             )   
     
     
