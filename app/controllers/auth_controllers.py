@@ -57,8 +57,8 @@ class AuthController():
             
             raise HTTPException(
                 status_code=error_dict.get('status_code', 500),
-                detail=error_dict.get('detail', 'Internal server error!')
-            )    
+                detail=error_dict.get('detail', str(e))  
+            )   
     
     
     @staticmethod
