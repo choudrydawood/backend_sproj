@@ -42,7 +42,7 @@ class AuthController():
                 value=refresh_token,
                 httponly=True,
                 secure=True,
-                samesite='Strict',
+                samesite='none',
                 max_age=60*60*24*7
             )
             return {'access_token': access_token, 'user': new_user}
@@ -87,7 +87,7 @@ class AuthController():
                 value=refresh_token,
                 httponly=True,
                 secure=True,
-                samesite='Strict',
+                samesite='none',
                 max_age=60*60*24*7
             )
             return {'access_token': access_token, 'user': exisiting_user}
