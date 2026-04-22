@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Depends, HTTPException
+from fastapi import FastAPI, Depends, HTTPException, APIRouter
 import os
 import subprocess
 from pathlib import Path
@@ -66,6 +66,20 @@ app.include_router(video_tutorial_router)
 app.include_router(admin_router)
 app.include_router(llm_router)
 app.include_router(socket_router)
+
+
+router = APIRouter()
+
+
+@router.get("/debug-env")
+async def debug_env():
+    import os
+    return {
+        "ACCESS_SECRET": os.getenv("ACCESS_SECRET"),
+        "REFRESH_SECRET": os.getenv("REFRESH_SECRET"),
+        "ALGORITHM": os.getenv("ALGORITHM"),
+        "REFRESH_EXPIRY": os.getenv("REFRESH_EXPIRY"),
+    }
 
 
 async def reset_database_and_migrations():
