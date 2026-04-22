@@ -70,6 +70,10 @@ app.include_router(socket_router)
 
 router = APIRouter()
 
+app.include_router(router)
+
+
+
 
 @router.get("/debug-env")
 async def debug_env():
