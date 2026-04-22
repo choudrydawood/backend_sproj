@@ -70,9 +70,6 @@ app.include_router(socket_router)
 
 router = APIRouter()
 
-app.include_router(router)
-
-
 
 
 @router.get("/debug-env")
@@ -84,6 +81,10 @@ async def debug_env():
         "ALGORITHM": os.getenv("ALGORITHM"),
         "REFRESH_EXPIRY": os.getenv("REFRESH_EXPIRY"),
     }
+
+
+app.include_router(router)
+
 
 
 async def reset_database_and_migrations():
