@@ -68,24 +68,6 @@ app.include_router(llm_router)
 app.include_router(socket_router)
 
 
-router = APIRouter()
-
-
-
-@router.get("/debug-env")
-async def debug_env():
-    import os
-    return {
-        "ACCESS_SECRET": os.getenv("ACCESS_SECRET"),
-        "REFRESH_SECRET": os.getenv("REFRESH_SECRET"),
-        "ALGORITHM": os.getenv("ALGORITHM"),
-        "REFRESH_EXPIRY": os.getenv("REFRESH_EXPIRY"),
-    }
-
-
-app.include_router(router)
-
-
 
 async def reset_database_and_migrations():
     """Delete all tables/data and migrations - USE WITH CAUTION!"""
