@@ -53,9 +53,9 @@ class AuthController():
         
         except Exception as e:
             await db.rollback()
-            print(f"LOGIN ERROR: {type(e).__name__}: {str(e)}", flush=True)  # 👈 add this
+            print(f"LOGIN ERROR: {type(e).__name__}: {str(e)}", flush=True)
             import traceback
-            traceback.print_exc()  # 👈 and this
+            traceback.print_exc()
             error_dict = e.__dict__
             
             raise HTTPException(
@@ -101,9 +101,9 @@ class AuthController():
         
         except Exception as e:
             await db.rollback()
-            print(f"LOGIN ERROR: {type(e).__name__}: {str(e)}", flush=True)  # 👈 add this
+            print(f"LOGIN ERROR: {type(e).__name__}: {str(e)}", flush=True)
             import traceback
-            traceback.print_exc()  # 👈 and this
+            traceback.print_exc()
             error_dict = e.__dict__
             
             raise HTTPException(
@@ -143,7 +143,15 @@ class AuthController():
     
     @staticmethod
     async def logout_user_func(res: Response):
-        res.delete_cookie("refreshToken")
+        res.set_cookie(
+            key="refreshToken",
+            value="",
+            httponly=True,
+            secure=True,
+            samesite="none",
+            max_age=0,
+            expires=0,
+        )
         return {"message": "Logged out successfully"}
         
         
